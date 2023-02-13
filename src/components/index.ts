@@ -1,1 +1,3 @@
-export { default as RSlideIn } from "./SlideIn.vue";
+export * from "./slide-in";
+export * from "./underline";
+export * from "./background-fade";
