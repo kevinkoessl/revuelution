@@ -57,7 +57,7 @@ npm install @css-render/vue3-ssr --save
 
 ### 2 Add Revuelution plugin
 
-In your _/plugins_ folder create a file \_revuelution.plugin.js.
+In your _/plugins_ folder create a file _revuelution.plugin.js_.
 
 Paste this Nuxt Plugin configuration into the file you just created:
 
