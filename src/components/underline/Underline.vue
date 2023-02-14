@@ -19,6 +19,12 @@
 import { defineComponent } from "vue";
 import gsap from "gsap";
 
+interface Process {
+  server: any;
+}
+
+let process: Process | undefined;
+
 export default defineComponent({
   name: "RUnderline",
 
@@ -68,14 +74,22 @@ export default defineComponent({
   data() {
     return {
       timeline: null,
-      _uid: Math.random().toString().replace(".", ""),
+      _uid: "",
     };
   },
 
-  mounted() {
-    window.addEventListener("resize", this.onResize);
+  created() {
+    if (typeof process !== "undefined") {
+      if (process.server) this._uid = Math.random().toString().replace(".", "");
+    } else {
+      this._uid = Math.random().toString().replace(".", "");
+    }
+  },
 
-    this.renderTimeline();
+  mounted() {
+    this._uid = Math.random().toString().replace(".", "");
+    window.addEventListener("resize", this.onResize);
+    setTimeout(this.renderTimeline, 10);
   },
 
   computed: {
