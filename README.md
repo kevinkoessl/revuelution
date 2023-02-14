@@ -65,13 +65,6 @@ Paste this Nuxt Plugin configuration into the file you just created:
 import { setup } from "@css-render/vue3-ssr";
 import { defineNuxtPlugin } from "#app";
 
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-if (process.client) {
-  gsap.registerPlugin(ScrollTrigger);
-}
-
 export default defineNuxtPlugin((nuxtApp) => {
   if (process.server) {
     const { collect } = setup(nuxtApp.vueApp);
