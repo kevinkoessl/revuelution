@@ -95,6 +95,19 @@ export default defineNuxtPlugin((nuxtApp) => {
 });
 ```
 
+### 3 Add styling
+
+In your _nuxt.config.js_ or _nux.config.ts_ add the following line:
+
+```javascript
+export default defineNuxtConfig({
+  ...
+  css: ["revuelution/styles.css"],
+  ...
+});
+
+```
+
 Now you should be good to go!
 
 ## Current status
