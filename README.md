@@ -1,47 +1,110 @@
 # revuelution
 
-This template should help get you started developing with Vue 3 in Vite.
-Lightweight UI components for Vue.js based on gsap.
+Animated UI components for Vue.js based on gsap.
 
-## Recommended IDE Setup
+## Quick start
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+You need [Vue.js] **version 3+** or **Nuxt 3**.
 
-## Type Support for `.vue` Imports in TS
+### 1 Install via npm
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
+```bash
+npm install revuelution --save
 ```
 
-### Compile and Hot-Reload for Development
+### 2 Import and use Revuelution
 
-```sh
-npm run dev
+Bundle
+
+```javascript
+import { createApp } from "vue";
+import App from "./App.vue";
+
+import Revuelution from "revuelution";
+import "revuelution/styles.css";
+
+const app = createApp(App);
+
+app.use(Revuelution);
+
+app.mount("#app");
 ```
 
-### Type-Check, Compile and Minify for Production
+or Individual Components
 
-```sh
-npm run build
+```vue
+<script setup>
+import { RUnderline } from "revuelution";
+import { RSlideIn } from "revuelution";
+</script>
+
+<template>
+  <r-slide-in>
+    <r-underline>Hello World!</r-underline>
+  </r-slide-in>
+</template>
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## SSR
 
-```sh
-npm run lint
+If you are using Nuxt 3, you need to take some additional steps.
+
+### 1 Install @css-render/vue3-ssr package
+
+```bash
+npm install @css-render/vue3-ssr --save
 ```
+
+### 2 Add Revuelution plugin
+
+In your _/plugins_ folder create a file _revuelution.plugin.js_.
+
+Paste this Nuxt Plugin configuration into the file you just created:
+
+```javascript
+import { setup } from "@css-render/vue3-ssr";
+import { defineNuxtPlugin } from "#app";
+
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+if (process.client) {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+export default defineNuxtPlugin((nuxtApp) => {
+  if (process.server) {
+    const { collect } = setup(nuxtApp.vueApp);
+    const originalRenderMeta = nuxtApp.ssrContext?.renderMeta;
+    nuxtApp.ssrContext = nuxtApp.ssrContext || {};
+    nuxtApp.ssrContext.renderMeta = () => {
+      if (!originalRenderMeta) {
+        return {
+          headTags: collect(),
+        };
+      }
+      const originalMeta = originalRenderMeta();
+      if ("then" in originalMeta) {
+        return originalMeta.then((resolvedOriginalMeta) => {
+          return {
+            ...resolvedOriginalMeta,
+            headTags: resolvedOriginalMeta["headTags"] + collect(),
+          };
+        });
+      } else {
+        return {
+          ...originalMeta,
+          headTags: originalMeta["headTags"] + collect(),
+        };
+      }
+    };
+  }
+});
+```
+
+Now you should be good to go!
+
+## Current status
+
+Right now Revuelution is just a side project that is meant to test some things out.
+Future developments and maintenance are unknown.
