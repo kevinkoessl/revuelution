@@ -12,6 +12,12 @@
 import { defineComponent } from "vue";
 import gsap from "gsap";
 
+interface Process {
+  server: any;
+}
+
+let process: Process | undefined;
+
 export default defineComponent({
   name: "RSlideIn",
 
@@ -61,16 +67,23 @@ export default defineComponent({
   data() {
     return {
       timeline: null,
-      _uid: Math.random().toString().replace(".", ""),
+      _uid: "",
     };
   },
 
-  mounted() {
-    window.addEventListener("resize", this.onResize);
-
-    this.renderTimeline();
+  created() {
+    if (typeof process !== "undefined") {
+      if (process.server) this._uid = Math.random().toString().replace(".", "");
+    } else {
+      this._uid = Math.random().toString().replace(".", "");
+    }
   },
 
+  mounted() {
+    this._uid = Math.random().toString().replace(".", "");
+    window.addEventListener("resize", this.onResize);
+    setTimeout(this.renderTimeline, 10);
+  },
   computed: {
     xDistance() {
       if (this.direction.trim() === "right-to-left") return "100px";
