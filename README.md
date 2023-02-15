@@ -2,6 +2,12 @@
 
 Animated UI components for Vue.js based on gsap.
 
+## Documentation
+
+The documentation is in the docs directory, it serves as the demo as well.
+
+Browse [online documentation here](https://revuelution.com/).
+
 ## Quick start
 
 You need [Vue.js] **version 3+** or **Nuxt 3**.
@@ -93,6 +99,19 @@ export default defineNuxtPlugin((nuxtApp) => {
     };
   }
 });
+```
+
+### 3 Add styling
+
+In your _nuxt.config.js_ or _nux.config.ts_ add the following line:
+
+```javascript
+export default defineNuxtConfig({
+  ...
+  css: ["revuelution/styles.css"],
+  ...
+});
+
 ```
 
 Now you should be good to go!
