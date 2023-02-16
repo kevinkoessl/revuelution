@@ -130,6 +130,7 @@ export default defineComponent({
     position: absolute;
     width: 500px;
     height: 500px;
+    pointer-events: none;
     background: radial-gradient(
       #10b981,
       rgba(250, 255, 129, 0.3) 50%,

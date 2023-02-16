@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LightBulbSection from "./components/lightbulb-section/LightBulbSection.vue";
+import LetterCluster from "./components/letter-cluster/LetterCluster.vue";
 </script>
 
 <template>
@@ -8,7 +9,7 @@ import LightBulbSection from "./components/lightbulb-section/LightBulbSection.vu
     <div class="w-full flex h-screen items-center justify-center">
       <div class="container text-center">
         <h1 class="text-3xl lg:text-9xl text-white leading-normal">
-          REVUELUTION
+          <letter-cluster words="REVUELUTION"></letter-cluster>
         </h1>
 
         <h2 class="lg:text-3xl text-gray-300 font-thin mt-8">
