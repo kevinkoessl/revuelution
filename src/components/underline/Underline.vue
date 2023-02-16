@@ -153,7 +153,6 @@ export default defineComponent({
 }
 
 .kk-underline {
-  display: inline-block;
   position: relative;
 }
 
