@@ -9,6 +9,8 @@
 <script lang="ts">
 import gsap from "gsap";
 
+let timelines: Record<string, ReturnType<typeof gsap.timeline>> = {};
+
 export default {
   name: "RBackgroundFade.vue",
 
@@ -93,7 +95,12 @@ export default {
 
   methods: {
     renderTimeline() {
-      let timeline = null;
+      let timeline = timelines[this._uid];
+
+      if (typeof timeline?.kill === "function") {
+        timeline.kill();
+        delete timelines[this._uid];
+      }
 
       timeline = gsap.timeline({
         scrollTrigger: {
@@ -114,6 +121,7 @@ export default {
         this.fromVars,
         this.toVars
       );
+      timelines[this._uid] = timeline;
     },
     onResize() {
       this.renderTimeline();

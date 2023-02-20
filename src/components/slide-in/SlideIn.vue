@@ -12,6 +12,8 @@
 import { defineComponent } from "vue";
 import gsap from "gsap";
 
+let timelines: Record<string, ReturnType<typeof gsap.timeline>> = {};
+
 export default defineComponent({
   name: "RSlideIn",
 
@@ -101,9 +103,14 @@ export default defineComponent({
 
   methods: {
     renderTimeline() {
-      this.timeline = null;
+      let timeline = timelines[this._uid];
 
-      const timeline = gsap.timeline({
+      if (typeof timeline?.kill === "function") {
+        timeline.kill();
+        delete timelines[this._uid];
+      }
+
+      timeline = gsap.timeline({
         scrollTrigger: {
           trigger: `#start-trigger_${this._uid}`,
           start: `top ${this.scrollStart}%`,
@@ -118,6 +125,8 @@ export default defineComponent({
       });
       timeline.clear();
       timeline.from(`#r-slide-in_${this._uid}`, this.animationVars);
+
+      timelines[this._uid] = timeline;
     },
     onResize() {
       this.renderTimeline();

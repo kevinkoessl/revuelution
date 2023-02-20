@@ -5,7 +5,7 @@
   <span v-else>
     <span :id="`start-trigger_${_uid}`"></span>
     <span class="r-underline">
-      <span style="overflow: hidden" class="r-underline__wrapper"
+      <span class="r-underline__wrapper"
         ><span
           :id="`r-underline_${_uid}`"
           class="r-underline__segment"
@@ -22,7 +22,7 @@
 import { defineComponent } from "vue";
 import gsap from "gsap";
 
-let timeline: ReturnType<typeof gsap.timeline>;
+let timelines: Record<string, ReturnType<typeof gsap.timeline>> = {};
 
 export default defineComponent({
   name: "RUnderline",
@@ -77,7 +77,6 @@ export default defineComponent({
 
   data() {
     return {
-      timeline: null,
       _uid: "",
     };
   },
@@ -101,6 +100,18 @@ export default defineComponent({
         x: 0,
         opacity: 1,
         ease: this.ease,
+      };
+    },
+    timeline() {
+      let timeline: ReturnType<typeof gsap.timeline>;
+
+      return {
+        get: () => {
+          return timeline;
+        },
+        set(value: ReturnType<typeof gsap.timeline>) {
+          timeline = value;
+        },
       };
     },
 
@@ -128,7 +139,6 @@ export default defineComponent({
 
       const elementsToAnimate = parentDiv?.querySelectorAll(this.selector);
 
-      console.log("elems", elementsToAnimate);
       elementsToAnimate.forEach((element, key) => {
         const triggerNode = document.createElement("span");
         triggerNode.setAttribute("id", `start-trigger_${this._uid}_${key}`);
@@ -164,9 +174,14 @@ export default defineComponent({
       });
     },
     renderTimeline() {
-      console.log(this.selector);
+      let timeline = timelines[this._uid];
+
+      if (typeof timeline?.kill === "function") {
+        timeline.kill();
+        delete timelines[this._uid];
+      }
+
       if (!this.selector) {
-        if (typeof timeline?.kill === "function") timeline.kill();
         timeline = gsap.timeline({
           scrollTrigger: {
             trigger: `#start-trigger_${this._uid}`,
@@ -188,6 +203,7 @@ export default defineComponent({
           this.toVars
         );
 
+        timelines[this._uid] = timeline;
         return;
       }
 
@@ -205,13 +221,14 @@ export default defineComponent({
         },
       });
 
-      console.log("Attaching scroll trigger to html");
-
+      timeline.clear();
       timeline.fromTo(
         `#r-underline-container_${this._uid} .r-underline__segment`,
         this.fromVars,
         this.toVars
       );
+
+      timelines[this._uid] = timeline;
     },
     onResize() {
       this.renderTimeline();
