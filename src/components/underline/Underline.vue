@@ -22,18 +22,7 @@
 import { defineComponent } from "vue";
 import gsap from "gsap";
 
-interface Process {
-  server: any;
-  client: any;
-}
-
-let process: Process | undefined;
-
-const uid = Math.random().toString().replace(".", "");
-
 let timeline: ReturnType<typeof gsap.timeline>;
-
-let tlCounter = 0;
 
 export default defineComponent({
   name: "RUnderline",
@@ -91,16 +80,6 @@ export default defineComponent({
       timeline: null,
       _uid: "",
     };
-  },
-
-  created() {
-    if (this._uid) return;
-
-    if (typeof process !== "undefined") {
-      if (process.server) this._uid = uid;
-    } else {
-      this._uid = uid;
-    }
   },
 
   mounted() {

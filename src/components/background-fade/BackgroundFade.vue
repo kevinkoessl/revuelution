@@ -9,12 +9,6 @@
 <script lang="ts">
 import gsap from "gsap";
 
-interface Process {
-  server: any;
-}
-
-let process: Process | undefined;
-
 export default {
   name: "RBackgroundFade.vue",
 
@@ -68,19 +62,12 @@ export default {
     };
   },
 
-  created() {
-    if (typeof process !== "undefined") {
-      if (process.server) this._uid = Math.random().toString().replace(".", "");
-    } else {
-      this._uid = Math.random().toString().replace(".", "");
-    }
-  },
-
   mounted() {
     this._uid = Math.random().toString().replace(".", "");
     window.addEventListener("resize", this.onResize);
     setTimeout(this.renderTimeline, 10);
   },
+
   computed: {
     sectionStyle() {
       return {
