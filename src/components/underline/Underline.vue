@@ -1,8 +1,11 @@
 <template>
-  <span v-if="!selector">
+  <div v-if="selector" :id="`r-underline-container_${_uid}`">
+    <slot></slot>
+  </div>
+  <span v-else>
     <span :id="`start-trigger_${_uid}`"></span>
     <span class="r-underline">
-      <span style="overflow: hidden" class="r-underline__segment"
+      <span style="overflow: hidden" class="r-underline__wrapper"
         ><span
           :id="`r-underline_${_uid}`"
           class="r-underline__segment"
@@ -14,9 +17,6 @@
       </span>
     </span>
   </span>
-  <div v-else :id="`r-underline-container_${_uid}`">
-    <slot></slot>
-  </div>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
@@ -24,11 +24,16 @@ import gsap from "gsap";
 
 interface Process {
   server: any;
+  client: any;
 }
 
 let process: Process | undefined;
 
 const uid = Math.random().toString().replace(".", "");
+
+let timeline: ReturnType<typeof gsap.timeline>;
+
+let tlCounter = 0;
 
 export default defineComponent({
   name: "RUnderline",
@@ -90,7 +95,6 @@ export default defineComponent({
 
   created() {
     if (this._uid) return;
-    console.log("created", uid);
 
     if (typeof process !== "undefined") {
       if (process.server) this._uid = uid;
@@ -100,9 +104,11 @@ export default defineComponent({
   },
 
   mounted() {
-    this.setupDom();
-    //window.addEventListener("resize", this.onResize);
-    setTimeout(this.renderTimeline, 1000);
+    this._uid = Math.random().toString().replace(".", "");
+
+    setTimeout(this.setupDom, 10);
+    window.addEventListener("resize", this.onResize);
+    setTimeout(this.renderTimeline, 20);
   },
 
   computed: {
@@ -138,21 +144,24 @@ export default defineComponent({
       const parentDiv = document.querySelector(
         `#r-underline-container_${this._uid}`
       );
-      const elementsToAnimate = parentDiv.querySelectorAll(this.selector);
 
+      if (!parentDiv) return;
+
+      const elementsToAnimate = parentDiv?.querySelectorAll(this.selector);
+
+      console.log("elems", elementsToAnimate);
       elementsToAnimate.forEach((element, key) => {
         const triggerNode = document.createElement("span");
         triggerNode.setAttribute("id", `start-trigger_${this._uid}_${key}`);
         element.parentNode.insertBefore(triggerNode, element);
 
         const lineNode = document.createElement("span");
-        lineNode.classList.add("r-underline__segment");
-        lineNode.setAttribute("style", "overflow: hidden");
+        lineNode.classList.add("r-underline__wrapper");
 
         const lineBackground = document.createElement("span");
 
         lineBackground.setAttribute("id", `r-underline_${this._uid}_${key}`);
-        lineBackground.classList.add("r-underline__segment", "animate");
+        lineBackground.classList.add("r-underline__segment");
         lineBackground.setAttribute(
           "style",
           `background: ${this.lineBackground}`
@@ -176,8 +185,10 @@ export default defineComponent({
       });
     },
     renderTimeline() {
+      console.log(this.selector);
       if (!this.selector) {
-        const timeline = gsap.timeline({
+        if (typeof timeline?.kill === "function") timeline.kill();
+        timeline = gsap.timeline({
           scrollTrigger: {
             trigger: `#start-trigger_${this._uid}`,
             start: `top ${this.scrollStart}%`,
@@ -201,7 +212,7 @@ export default defineComponent({
         return;
       }
 
-      const timeline = gsap.timeline({
+      timeline = gsap.timeline({
         scrollTrigger: {
           trigger: `#r-underline-container_${this._uid}`,
           start: `top ${this.scrollStart}%`,
@@ -215,7 +226,13 @@ export default defineComponent({
         },
       });
 
-      timeline.fromTo(`.animate`, this.fromVars, this.toVars);
+      console.log("Attaching scroll trigger to html");
+
+      timeline.fromTo(
+        `#r-underline-container_${this._uid} .r-underline__segment`,
+        this.fromVars,
+        this.toVars
+      );
     },
     onResize() {
       this.renderTimeline();
@@ -224,12 +241,19 @@ export default defineComponent({
 });
 </script>
 <style lang="scss">
-.r-underline__segment {
+.r-underline__wrapper {
+  overflow: hidden;
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 0.1em;
+}
+
+.r-underline__segment {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .r-underline {

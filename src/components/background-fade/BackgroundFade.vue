@@ -77,6 +77,7 @@ export default {
   },
 
   mounted() {
+    this._uid = Math.random().toString().replace(".", "");
     window.addEventListener("resize", this.onResize);
     setTimeout(this.renderTimeline, 10);
   },
