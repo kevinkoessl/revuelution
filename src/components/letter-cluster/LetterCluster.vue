@@ -18,10 +18,13 @@
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
+
 export default defineComponent({
   name: "LetterCluster",
   props: {
-    words: [] || String,
+    words: {
+      type: String,
+    },
   },
   data() {
     return {
@@ -31,10 +34,11 @@ export default defineComponent({
   computed: {
     positions() {
       let words = this.words;
-      if (typeof words === "string") {
-        words = words.split("");
+      let wordArray: string[] = [];
+      if (typeof words == "string") {
+        wordArray = words.split("");
       }
-      return words.map(() => {
+      return wordArray.map(() => {
         let rotate = 45 - Math.floor(Math.random() * 90);
         let translateX = 20 - Math.floor(Math.random() * 40);
         let translateY = 40 - Math.floor(Math.random() * 80);

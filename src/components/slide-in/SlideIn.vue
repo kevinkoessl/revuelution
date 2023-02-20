@@ -28,13 +28,13 @@ export default defineComponent({
     },
 
     scrollStart: {
-      type: Number,
+      type: [Number, String],
       required: false,
       default: 70,
     },
 
     scrollDistance: {
-      type: Number,
+      type: [Number, String],
       required: false,
       default: 200,
     },

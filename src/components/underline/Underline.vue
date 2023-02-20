@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span v-if="!selector">
     <span :id="`start-trigger_${_uid}`"></span>
     <span class="r-underline">
       <span style="overflow: hidden" class="r-underline__segment"
@@ -14,6 +14,7 @@
       </span>
     </span>
   </span>
+  <div v-else></div>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
@@ -29,19 +30,24 @@ export default defineComponent({
   name: "RUnderline",
 
   props: {
+    selector: {
+      type: String,
+      required: false,
+    },
+
     scrub: {
       required: false,
       default: 1,
     },
 
     scrollStart: {
-      type: Number,
+      type: [Number, String],
       required: false,
       default: 50,
     },
 
     scrollDistance: {
-      type: Number,
+      type: [Number, String],
       required: false,
       default: 100,
     },
@@ -59,7 +65,7 @@ export default defineComponent({
     },
 
     opacity: {
-      type: Number,
+      type: [Number, String],
       required: false,
       default: 1,
     },
