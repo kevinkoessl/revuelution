@@ -66,36 +66,40 @@ import LetterCluster from "./components/letter-cluster/LetterCluster.vue";
         </div>
       </div>
     </div>
-
-    <r-background-fade from-color="#1c1917" to-color="#fafafa" class="w-full">
-      <div class="flex w-full justify-center">
-        <div
-          class="container items-center px-3 lg:px-24 py-48 mt-48 text-stone-900 leading-relaxed"
-        >
-          <div class="w-full flex h-96"></div>
-          <div>
-            <h2 class="text-3xl lg:text-5xl">Getting started</h2>
-            <div class="py-9">
-              <h3 class="text-2xl lg:text-4xl">
-                <span class="text-fuchsia-600"># </span>1 NPM
-              </h3>
-              <div class="py-12">
-                <h4 class="text-xl lg:text-3xl">Installation</h4>
-                <pre
-                  v-highlightjs
-                ><code class="javascript bg-slate-100 lg:px-8 shadow-inner my-4 ">
+  </light-bulb-section>
+  <r-background-fade from-color="#1c1917" to-color="#fafafa" class="w-full">
+    <div class="flex w-full justify-center">
+      <div
+        class="container items-center px-3 lg:px-24 py-48 mt-48 text-stone-900 leading-relaxed"
+      >
+        <div class="w-full flex h-96"></div>
+        <div>
+          <h2 class="text-3xl lg:text-5xl">Getting started</h2>
+          <div class="py-9">
+            <h3 class="text-2xl lg:text-4xl">
+              <span class="text-fuchsia-600"># </span>1 NPM
+            </h3>
+            <div class="py-12">
+              <h4 class="text-xl lg:text-3xl">Installation</h4>
+              <pre
+                v-highlightjs
+              ><code class="javascript bg-slate-100 lg:px-8 shadow-inner my-4 ">
   npm install revuelution --save
               </code></pre>
-              </div>
-              <div class="py-12">
-                <h4 class="text-xl lg:text-3xl">Usage</h4>
-                <div class="mt-4 bg-slate-600 p-4 text-xl text-white">
-                  Full bundle
-                </div>
+            </div>
 
-                <pre
-                  v-highlightjs
-                ><code class="javascript bg-slate-100 lg:p-8 shadow-inner mb-4 ">
+            <h3 class="text-2xl lg:text-4xl">
+              <span class="text-fuchsia-600"># </span>2 NPM
+            </h3>
+            <div class="py-12">
+              <h4 class="text-xl lg:text-3xl">Usage</h4>
+              <div class="mt-4 bg-slate-600 p-4 text-xl text-white">
+                Full bundle
+              </div>
+
+              <pre
+                v-highlightjs
+              ><code class="javascript bg-slate-100 lg:p-8 shadow-inner mb-4 ">
   import { createApp } from "vue"; 
   import App from "./App.vue";
   
@@ -107,14 +111,14 @@ import LetterCluster from "./components/letter-cluster/LetterCluster.vue";
                 
   app.mount("#app");
               </code></pre>
-                <h4 class="text-xl lg:text-3xl my-8">or</h4>
-                <div class="mt-4 bg-slate-600 p-4 text-xl text-white">
-                  Individual components
-                </div>
+              <h4 class="text-xl lg:text-3xl my-8">or</h4>
+              <div class="mt-4 bg-slate-600 p-4 text-xl text-white">
+                Individual components
+              </div>
 
-                <pre
-                  v-highlightjs
-                ><code class="javascript bg-slate-100 lg:p-8 shadow-inner mb-4 ">
+              <pre
+                v-highlightjs
+              ><code class="javascript bg-slate-100 lg:p-8 shadow-inner mb-4 ">
   &lt;script setup&gt;
     import { RBackgroundFade} from &quot;revuelution&quot;;
     import { RUnderline } from &quot;revuelution&quot;;
@@ -136,13 +140,89 @@ import LetterCluster from "./components/letter-cluster/LetterCluster.vue";
       &lt;/r-underline&gt;
   &lt;/template&gt;
               </code></pre>
-              </div>
             </div>
           </div>
         </div>
       </div>
-    </r-background-fade>
-  </light-bulb-section>
+    </div>
+  </r-background-fade>
+
+  <div class="flex w-full justify-center bg-stone-50">
+    <div
+      class="container items-center px-3 lg:px-24 text-stone-900 leading-relaxed"
+    >
+      <div>
+        <h2 class="text-3xl lg:text-5xl">SSR</h2>
+        <div class="py-9">
+          <div class="lg:text-xl pb-5">
+            If you are using Nuxt 3, you need to take some additional steps.
+          </div>
+          <h3 class="text-2xl lg:text-4xl">
+            <span class="text-fuchsia-600"># </span>1 Install
+            @css-render/vue3-ssr package
+          </h3>
+          <div class="py-12">
+            <h4 class="text-xl lg:text-3xl">Installation</h4>
+            <pre
+              v-highlightjs
+            ><code class="javascript bg-slate-100 lg:px-8 shadow-inner my-4 ">
+npm install @css-render/vue3-ssr --save
+              </code></pre>
+          </div>
+
+          <h3 class="text-2xl lg:text-4xl">
+            <span class="text-fuchsia-600"># </span>2 Add Revuelution Plugin
+          </h3>
+          <div class="py-12">
+            <h4 class="text-xl lg:text-xl">
+              In your /plugins folder create a file revuelution.plugin.js.
+            </h4>
+            <div class="mt-4 bg-slate-600 p-4 text-xl text-white">
+              Paste this Nuxt Plugin configuration into the file you just
+              created:
+            </div>
+
+            <pre
+              v-highlightjs
+            ><code class="javascript bg-slate-100 lg:p-8 shadow-inner mb-4 ">
+import { setup } from "@css-render/vue3-ssr";
+import { defineNuxtPlugin } from "#app";
+
+export default defineNuxtPlugin((nuxtApp) => {
+  if (process.server) {
+    const { collect } = setup(nuxtApp.vueApp);
+    const originalRenderMeta = nuxtApp.ssrContext?.renderMeta;
+    nuxtApp.ssrContext = nuxtApp.ssrContext || {};
+    nuxtApp.ssrContext.renderMeta = () => {
+      if (!originalRenderMeta) {
+        return {
+          headTags: collect(),
+        };
+      }
+      const originalMeta = originalRenderMeta();
+      if ("then" in originalMeta) {
+        return originalMeta.then((resolvedOriginalMeta) => {
+          return {
+            ...resolvedOriginalMeta,
+            headTags: resolvedOriginalMeta["headTags"] + collect(),
+          };
+        });
+      } else {
+        return {
+          ...originalMeta,
+          headTags: originalMeta["headTags"] + collect(),
+        };
+      }
+    };
+  }
+});
+              </code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div>
     <div
       class="w-full flex h-24 items-center justify-center text-white font-artistic"

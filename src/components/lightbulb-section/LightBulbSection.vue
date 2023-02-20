@@ -3,7 +3,8 @@
     :class="type"
     class="light-blub-section hero is-fullheight"
     ref="container"
-    @mouseenter="onMouseMove($event)"
+    @mousemove="onMouseMove($event)"
+    @mouseenter="onMouseEnter()"
     @mouseleave="dimLight()"
   >
     <div
@@ -65,14 +66,6 @@ export default defineComponent({
     onScroll() {
       let containerRect = this.contaienrRef.getBoundingClientRect();
 
-      if (this.hasLight) {
-        this.lightScale = 1;
-        this.lightOpacity = 1;
-      } else {
-        this.lightScale = 0.5;
-        this.lightOpacity = 0;
-      }
-
       requestAnimationFrame(() => {
         this.containerPosition = {
           x: containerRect.x,
@@ -81,16 +74,13 @@ export default defineComponent({
       });
     },
 
+    onMouseEnter() {
+      this.lightScale = 1;
+      this.lightOpacity = 1;
+    },
+
     onMouseMove(event: MouseEvent) {
       let containerRect = this.contaienrRef.getBoundingClientRect();
-
-      if (this.hasLight) {
-        this.lightScale = 1;
-        this.lightOpacity = 1;
-      } else {
-        this.lightScale = 0.5;
-        this.lightOpacity = 0;
-      }
 
       requestAnimationFrame(() => {
         this.containerPosition = {
@@ -105,7 +95,8 @@ export default defineComponent({
       });
     },
     dimLight() {
-      this.lightScale = 1;
+      console.log("dim light");
+      this.lightScale = 0.8;
       this.lightOpacity = 0;
     },
   },
@@ -124,7 +115,7 @@ export default defineComponent({
 .light-blub-section {
   user-select: none;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   &__light {
     display: block;
     position: absolute;
