@@ -1,15 +1,15 @@
 <template>
   <span>
     <span :id="`start-trigger_${_uid}`"></span>
-    <span class="kk-underline">
-      <span style="overflow: hidden" class="kk-underline__segment"
+    <span class="r-underline">
+      <span style="overflow: hidden" class="r-underline__segment"
         ><span
-          :id="`kk-underline_${_uid}`"
-          class="kk-underline__segment"
+          :id="`r-underline_${_uid}`"
+          class="r-underline__segment"
           :style="lineStyle"
         ></span>
       </span>
-      <span class="kk-underline__content">
+      <span class="r-underline__content">
         <slot></slot>
       </span>
     </span>
@@ -135,7 +135,7 @@ export default defineComponent({
       });
 
       timeline.clear();
-      timeline.fromTo(`#kk-underline_${this._uid}`, this.fromVars, this.toVars);
+      timeline.fromTo(`#r-underline_${this._uid}`, this.fromVars, this.toVars);
     },
     onResize() {
       this.renderTimeline();
@@ -144,7 +144,7 @@ export default defineComponent({
 });
 </script>
 <style lang="scss" scoped>
-.kk-underline__segment {
+.r-underline__segment {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -152,11 +152,11 @@ export default defineComponent({
   height: 0.1em;
 }
 
-.kk-underline {
+.r-underline {
   position: relative;
 }
 
-.kk-underline__content {
+.r-underline__content {
   position: relative;
   width: 100%;
 }
