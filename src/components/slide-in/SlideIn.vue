@@ -12,11 +12,7 @@
 import { defineComponent } from "vue";
 import gsap from "gsap";
 
-interface Process {
-  server: any;
-}
-
-let process: Process | undefined;
+let timelines: Record<string, ReturnType<typeof gsap.timeline>> = {};
 
 export default defineComponent({
   name: "RSlideIn",
@@ -25,6 +21,12 @@ export default defineComponent({
     scrub: {
       default: 1,
       required: false,
+    },
+
+    isActive: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
 
     scrollStart: {
@@ -71,15 +73,8 @@ export default defineComponent({
     };
   },
 
-  created() {
-    if (typeof process !== "undefined") {
-      if (process.server) this._uid = Math.random().toString().replace(".", "");
-    } else {
-      this._uid = Math.random().toString().replace(".", "");
-    }
-  },
-
   mounted() {
+    this._uid = Math.random().toString().replace(".", "");
     window.addEventListener("resize", this.onResize);
     setTimeout(this.renderTimeline, 10);
   },
@@ -110,13 +105,21 @@ export default defineComponent({
 
   watch: {
     animationVars: "renderTimeline",
+    isActive: "renderTimeline",
   },
 
   methods: {
     renderTimeline() {
-      this.timeline = null;
+      let timeline = timelines[this._uid];
 
-      const timeline = gsap.timeline({
+      if (typeof timeline?.kill === "function") {
+        timeline.kill();
+        delete timelines[this._uid];
+      }
+
+      if (!this.isActive) return;
+
+      timeline = gsap.timeline({
         scrollTrigger: {
           trigger: `#start-trigger_${this._uid}`,
           start: `top ${this.scrollStart}%`,
@@ -131,6 +134,8 @@ export default defineComponent({
       });
       timeline.clear();
       timeline.from(`#r-slide-in_${this._uid}`, this.animationVars);
+
+      timelines[this._uid] = timeline;
     },
     onResize() {
       this.renderTimeline();

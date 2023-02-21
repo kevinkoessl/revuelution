@@ -1,8 +1,11 @@
 <template>
-  <span v-if="!selector">
+  <div v-if="selector" :id="`r-underline-container_${_uid}`">
+    <slot></slot>
+  </div>
+  <span v-else>
     <span :id="`start-trigger_${_uid}`"></span>
     <span class="r-underline">
-      <span style="overflow: hidden" class="r-underline__segment"
+      <span class="r-underline__wrapper"
         ><span
           :id="`r-underline_${_uid}`"
           class="r-underline__segment"
@@ -14,17 +17,12 @@
       </span>
     </span>
   </span>
-  <div v-else></div>
 </template>
 <script lang="ts">
 import { defineComponent } from "vue";
 import gsap from "gsap";
 
-interface Process {
-  server: any;
-}
-
-let process: Process | undefined;
+let timelines: Record<string, ReturnType<typeof gsap.timeline>> = {};
 
 export default defineComponent({
   name: "RUnderline",
@@ -38,6 +36,12 @@ export default defineComponent({
     scrub: {
       required: false,
       default: 1,
+    },
+
+    isActive: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
 
     scrollStart: {
@@ -79,23 +83,16 @@ export default defineComponent({
 
   data() {
     return {
-      timeline: null,
       _uid: "",
     };
   },
 
-  created() {
-    if (typeof process !== "undefined") {
-      if (process.server) this._uid = Math.random().toString().replace(".", "");
-    } else {
-      this._uid = Math.random().toString().replace(".", "");
-    }
-  },
-
   mounted() {
     this._uid = Math.random().toString().replace(".", "");
+
+    setTimeout(this.setupDom, 10);
     window.addEventListener("resize", this.onResize);
-    setTimeout(this.renderTimeline, 10);
+    setTimeout(this.renderTimeline, 20);
   },
 
   computed: {
@@ -111,6 +108,18 @@ export default defineComponent({
         ease: this.ease,
       };
     },
+    timeline() {
+      let timeline: ReturnType<typeof gsap.timeline>;
+
+      return {
+        get: () => {
+          return timeline;
+        },
+        set(value: ReturnType<typeof gsap.timeline>) {
+          timeline = value;
+        },
+      };
+    },
 
     fromVars() {
       return {
@@ -122,13 +131,94 @@ export default defineComponent({
 
   watch: {
     animationVars: "renderTimeline",
+    isActive: "renderTimeline",
   },
 
   methods: {
+    setupDom() {
+      if (!this.selector) return;
+
+      const parentDiv = document.querySelector(
+        `#r-underline-container_${this._uid}`
+      );
+
+      if (!parentDiv) return;
+
+      const elementsToAnimate = parentDiv?.querySelectorAll(this.selector);
+
+      elementsToAnimate.forEach((element, key) => {
+        const triggerNode = document.createElement("span");
+        triggerNode.setAttribute("id", `start-trigger_${this._uid}_${key}`);
+        element.parentNode.insertBefore(triggerNode, element);
+
+        const lineNode = document.createElement("span");
+        lineNode.classList.add("r-underline__wrapper");
+
+        const lineBackground = document.createElement("span");
+
+        lineBackground.setAttribute("id", `r-underline_${this._uid}_${key}`);
+        lineBackground.classList.add("r-underline__segment");
+        lineBackground.setAttribute(
+          "style",
+          `background: ${this.lineBackground}`
+        );
+
+        lineNode.appendChild(lineBackground);
+
+        const contentNode = document.createElement("span");
+        contentNode.classList.add("r-underline__content");
+        contentNode.innerHTML = element.innerHTML;
+
+        element.innerHTML = "";
+
+        element.classList.add("r-underline");
+        element.setAttribute(
+          "style",
+          `${element.getAttribute("style")}; white-space: nowrap;`
+        );
+        element.appendChild(lineNode);
+        element.appendChild(contentNode);
+      });
+    },
     renderTimeline() {
-      const timeline = gsap.timeline({
+      let timeline = timelines[this._uid];
+
+      if (typeof timeline?.kill === "function") {
+        timeline.kill();
+        delete timelines[this._uid];
+      }
+
+      if (!this.isActive) return;
+
+      if (!this.selector) {
+        timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: `#start-trigger_${this._uid}`,
+            start: `top ${this.scrollStart}%`,
+            end: `+=${this.scrollDistance}px`,
+            scrub: this.scrub,
+            markers: this.hasMarkers && {
+              startColor: "black",
+              endColor: "#70bed1",
+              fontSize: "20px",
+            },
+          },
+        });
+
+        timeline.clear();
+        timeline.fromTo(
+          `#r-underline_${this._uid}`,
+          this.fromVars,
+          this.toVars
+        );
+
+        timelines[this._uid] = timeline;
+        return;
+      }
+
+      timeline = gsap.timeline({
         scrollTrigger: {
-          trigger: `#start-trigger_${this._uid}`,
+          trigger: `#r-underline-container_${this._uid}`,
           start: `top ${this.scrollStart}%`,
           end: `+=${this.scrollDistance}px`,
           scrub: this.scrub,
@@ -141,7 +231,13 @@ export default defineComponent({
       });
 
       timeline.clear();
-      timeline.fromTo(`#r-underline_${this._uid}`, this.fromVars, this.toVars);
+      timeline.fromTo(
+        `#r-underline-container_${this._uid} .r-underline__segment`,
+        this.fromVars,
+        this.toVars
+      );
+
+      timelines[this._uid] = timeline;
     },
     onResize() {
       this.renderTimeline();
@@ -149,13 +245,20 @@ export default defineComponent({
   },
 });
 </script>
-<style lang="scss" scoped>
-.r-underline__segment {
+<style lang="scss">
+.r-underline__wrapper {
+  overflow: hidden;
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 0.1em;
+}
+
+.r-underline__segment {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .r-underline {

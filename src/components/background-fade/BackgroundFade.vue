@@ -9,11 +9,7 @@
 <script lang="ts">
 import gsap from "gsap";
 
-interface Process {
-  server: any;
-}
-
-let process: Process | undefined;
+let timelines: Record<string, ReturnType<typeof gsap.timeline>> = {};
 
 export default {
   name: "RBackgroundFade.vue",
@@ -22,6 +18,12 @@ export default {
     scrub: {
       default: true,
       required: false,
+    },
+
+    isActive: {
+      type: Boolean,
+      required: false,
+      default: true,
     },
 
     scrollStart: {
@@ -68,18 +70,12 @@ export default {
     };
   },
 
-  created() {
-    if (typeof process !== "undefined") {
-      if (process.server) this._uid = Math.random().toString().replace(".", "");
-    } else {
-      this._uid = Math.random().toString().replace(".", "");
-    }
-  },
-
   mounted() {
+    this._uid = Math.random().toString().replace(".", "");
     window.addEventListener("resize", this.onResize);
     setTimeout(this.renderTimeline, 10);
   },
+
   computed: {
     sectionStyle() {
       return {
@@ -101,11 +97,19 @@ export default {
 
   watch: {
     animationVars: "renderTimeline",
+    isActive: "renderTimeline",
   },
 
   methods: {
     renderTimeline() {
-      let timeline = null;
+      let timeline = timelines[this._uid];
+
+      if (typeof timeline?.kill === "function") {
+        timeline.kill();
+        delete timelines[this._uid];
+      }
+
+      if (!this.isActive) return;
 
       timeline = gsap.timeline({
         scrollTrigger: {
@@ -126,6 +130,7 @@ export default {
         this.fromVars,
         this.toVars
       );
+      timelines[this._uid] = timeline;
     },
     onResize() {
       this.renderTimeline();
