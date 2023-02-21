@@ -20,6 +20,12 @@ export default {
       required: false,
     },
 
+    isActive: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+
     scrollStart: {
       type: Number,
       required: false,
@@ -91,6 +97,7 @@ export default {
 
   watch: {
     animationVars: "renderTimeline",
+    isActive: "renderTimeline",
   },
 
   methods: {
@@ -101,6 +108,8 @@ export default {
         timeline.kill();
         delete timelines[this._uid];
       }
+
+      if (!this.isActive) return;
 
       timeline = gsap.timeline({
         scrollTrigger: {
